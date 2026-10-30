@@ -6,11 +6,10 @@
 
 1. 대회 규정, 제공 README, 데이터, 실행·제출 조건을 전부 읽습니다.
 2. `docs/00-start.md`의 분석 프롬프트로 필수 요건과 질문을 정리합니다.
-3. `docs/01-discovery.md`에 읽은 자료와 발견을 기록한 뒤, `docs/02-problem-brief.md`에서 범위를 확정합니다.
-4. 바뀌는 구현 판단은 `docs/03-decision-log.md`에 남깁니다.
-5. `docs/04-task-board.md`에서 **Now**의 핵심 흐름 하나만 구현합니다.
-6. 작업 단위마다 실행·검증하고 `docs/05-test-plan.md`에 결과를 기록합니다.
-7. 마감 40분 전부터는 새 기능을 멈추고 리뷰, 테스트, `docs/06-handoff.md`, Q&A 준비를 합니다.
+3. `prompts/discovery.md`를 호출해 `docs/01-discovery.md` 형식의 발견 기록을 만들고, `prompts/problem_brief.md`로 `docs/02-problem-brief.md`에서 범위를 확정합니다.
+4. `prompts/plan.md`를 호출해 `docs/04-task-board.md`의 작업 목록과 필요한 `docs/03-decision-log.md` 결정 행을 만듭니다.
+5. **Now**의 작업 하나마다 `prompts/implement.md`를 호출하고, 구현 결과와 검증 증거를 `docs/05-test-plan.md`에 반영합니다.
+6. 마감 40분 전부터는 새 기능을 멈추고 `prompts/review.md`로 리뷰/Q&A 보충 자료를, `prompts/handoff.md`로 `docs/06-handoff.md`를 작성합니다.
 
 ## 폴더 안내
 
@@ -48,6 +47,7 @@
 | `docs/06-handoff.md` | 현재 상태·다음 행동 인수인계 | `prompts/handoff.md`로 AI 초안 생성 | 실행법·완료 상태·한계가 사실인지 확인 |
 | `docs/07-qna-notes.md` | 제출 후 설명 대비 | AI에게 예상 질문·취약점 정리를 요청할 수 있음 | AI 없이 답할 수 있도록 말로 연습 |
 | `prompts/discovery.md` | 과제 자료 분석 | 그대로 AI에 전달 | AI 답변의 사실·추론·확인 필요 구분 점검 |
+| `prompts/problem_brief.md` | 문제·범위 합의 문서화 | 실무자 대화 뒤 AI에 전달 | 사실·가정·확정된 범위 점검 |
 | `prompts/plan.md` | MVP 작업 분해 | 그대로 AI에 전달 | 작업 크기·우선순위·범위 결정 |
 | `prompts/implement.md` | 단일 구현 작업 위임 | `[작업 하나]`를 채워 AI에 전달 | 계획 승인, 결과·테스트·리스크 확인 |
 | `prompts/review.md` | 심사관 관점 결함 점검 | 그대로 AI에 전달 | 시간 내 수정할 항목 선택 |
@@ -55,3 +55,16 @@
 
 실전 순서: `00-start → discovery → problem-brief → task-board → decision-log → test-plan → handoff/Q&A`.
 AI가 초안을 만들더라도 문제 정의, 우선순위, 테스트 결과, 최종 설명은 직접 확인합니다.
+
+## 프롬프트 호출과 산출물
+
+각 프롬프트는 결과를 바로 문서에 붙여 넣을 수 있는 Markdown으로 반환하도록 설계되어 있습니다. 프롬프트에 적힌 출력 형식을 바꾸지 말고, 결과를 아래 문서에 반영한 뒤 사실 여부를 검토합니다.
+
+| 단계 | 호출할 프롬프트 | 산출물 형식 / 반영 위치 |
+|---|---|---|
+| 발견 | `prompts/discovery.md` | 섹션과 표로 구성된 발견 기록 → `docs/01-discovery.md` |
+| 문제 합의 | `prompts/problem_brief.md` | 문제·성공 정의·범위·근거 표 → `docs/02-problem-brief.md` |
+| 계획 | `prompts/plan.md` | Now/Next/Later 체크박스와 결정 로그 표 행 → `docs/04-task-board.md`, `docs/03-decision-log.md` |
+| 구현·검증 | `prompts/implement.md` | 수정 파일 표, 검증 증거 표, 기록할 문서 변경 → 코드, `docs/05-test-plan.md`, 필요 시 `docs/03-decision-log.md` |
+| 리뷰 | `prompts/review.md` | 심각도별 리뷰 표와 Q&A 보충 항목 → `docs/07-qna-notes.md` |
+| 인수인계 | `prompts/handoff.md` | 현재 상태·실행법·검증 표·다음 우선순위 → `docs/06-handoff.md` |
